@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # 1. Service Database
+  db:
+    image: postgres:15-alpine
+    container_name: vro_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password_postgres_kamu
+      - POSTGRES_DB=vro_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./vro-be/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 2. Service Backend
+  backend:
+    build: ./vro-be
+    container_name: vro_backend
+    restart: always
+    ports:
+      - "8092:8080"
+    environment:
+      - PORT=8080
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password_postgres_kamu
+      - POSTGRES_DB=vro_db
+      - POSTGRES_PORT=5432
+    depends_on:
+      - db
+  # 3. Service Frontend (TAMBAHAN PENTING)
+  frontend:
+    build: ./vro-fe              # Path ke folder frontend
+    container_name: vro_frontend
+    ports:
+      - "3000:3000"              # Port Frontend (Next.js default)
+    depends_on:
+      - backend                  # Jalan setelah backend siap
+    restart: always
+
+volumes:
+  postgres_data:
