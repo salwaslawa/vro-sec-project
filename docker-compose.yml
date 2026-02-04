@@ -33,7 +33,10 @@ services:
       - db
   # 3. Service Frontend (TAMBAHAN PENTING)
   frontend:
-    build: ./vro-fe              # Path ke folder frontend
+    build: 
+      context: ./vro-fe              # Path ke folder frontend
+      args: 
+        NEXT_PUBLIC_API_URL: http://localhost:8092
     container_name: vro_frontend
     ports:
       - "3000:3000"              # Port Frontend (Next.js default)
@@ -41,5 +44,5 @@ services:
       - backend                  # Jalan setelah backend siap
     restart: always
 
-volumes:
+volumes:  
   postgres_data:
